@@ -8,7 +8,7 @@ export async function fetcher(
     retries = 3
 ) {
     const {
-        baseUrl = process.env.STRAPI_BASE_URL || "",
+        baseUrl = "",
         cacheStrategy = "default",
         revalidate = false,
         defaultHeaders = true,
