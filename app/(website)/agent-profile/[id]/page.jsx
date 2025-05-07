@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+// import { useParams, useSearchParams } from 'next/navigation';
 import { getUserData } from '../../../actions/user.action';
 import { getPropertiesWithPagination } from '../../../actions/property.action';
 import { getPropertyReviews } from '../../../actions/review.action';
@@ -10,15 +10,17 @@ import ProfileDetails from '../../../Components/pages/agent-profile/profile-deta
 import Properties from '../../../Components/pages/agent-profile/properties';
 import Reviews from '../../../Components/pages/agent-profile/reviews';
 
-const Page = () => {
-    const params = useParams();
-    const searchParams = useSearchParams();
-    const id = params?.id;
+const Page = async ({params, searchParams}) => {
+    // const params = useParams();
+    // const searchParams = useSearchParams();
+    // const id = params?.id;
+    const {id} =await params;
+    const {page , limit} =await searchParams;
     if (!id) {
         return <h1 className='text-2xl text-center py-60'>Invalid agent ID</h1>;
       }
-    const page = searchParams.get('page') || '1';
-    const limit = searchParams.get('limit') || '6';
+   console.log(id)
+   console.log(page, limit)
 
     const [userData, setUserData] = useState(null);
     const [properties, setProperties] = useState([]);
@@ -28,31 +30,31 @@ const Page = () => {
     const [errorMsg, setErrorMsg] = useState('');
 
 
-    useEffect(() => {
-        if (!id) return;
+    // useEffect(() => {
+    //     if (!id) return;
     
-        const fetchData = async () => {
-            setLoading(true);
-            setErrorMsg('');
+    //     const fetchData = async () => {
+    //         setLoading(true);
+    //         setErrorMsg('');
     
-            const { data, error } = await getUserData(id);
-            const { data: properties, error: propertyError } = await getPropertiesWithPagination(id, Number(page), Number(limit));
-            const { data: reviews, error: reviewsError } = await getPropertyReviews(id);
+    //         const { data, error } = await getUserData(id);
+    //         const { data: properties, error: propertyError } = await getPropertiesWithPagination(id, Number(page), Number(limit));
+    //         const { data: reviews, error: reviewsError } = await getPropertyReviews(id);
     
-            if (error || reviewsError || propertyError) {
-                setErrorMsg(error || reviewsError || propertyError);
-            } else {
-                setUserData(data?.user);
-                setProperties(properties.data);
-                setMeta(properties.meta);
-                setReviews(reviews);
-            }
+    //         if (error || reviewsError || propertyError) {
+    //             setErrorMsg(error || reviewsError || propertyError);
+    //         } else {
+    //             setUserData(data?.user);
+    //             setProperties(properties.data);
+    //             setMeta(properties.meta);
+    //             setReviews(reviews);
+    //         }
     
-            setLoading(false);
-        };
+    //         setLoading(false);
+    //     };
     
-        fetchData();
-    }, [id, page, limit]);
+    //     fetchData();
+    // }, [id, page, limit]);
     
     // useEffect(() => {
     //     const fetchData = async () => {
@@ -78,17 +80,18 @@ const Page = () => {
     //     if (id) fetchData();
     // }, [id, page, limit]);
 
-    if (loading) {
-        return <h1 className='text-2xl text-center py-60'>Loading...</h1>;
-    }
+    // if (loading) {
+    //     return <h1 className='text-2xl text-center py-60'>Loading...</h1>;
+    // }
 
-    if (errorMsg) {
-        return <h1 className='text-2xl text-center py-60'>Something went wrong: {errorMsg}</h1>;
-    }
+    // if (errorMsg) {
+    //     return <h1 className='text-2xl text-center py-60'>Something went wrong: {errorMsg}</h1>;
+    // }
 
     return (
         <div className='h-full'>
-            {userData && <Hero data={userData} />}
+            {id}
+            {/* {userData && <Hero data={userData} />}
             {userData && <ProfileDetails data={userData} reviews={reviews} />}
             <Properties
                 properties={properties}
@@ -97,7 +100,7 @@ const Page = () => {
                 currentPage={Number(page)}
                 currentLimit={Number(limit)}
             />
-            <Reviews id={id} data={reviews} />
+            <Reviews id={id} data={reviews} /> */}
         </div>
     );
 };
