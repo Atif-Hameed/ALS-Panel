@@ -203,7 +203,7 @@ const AgentMap = ({ data: initialData }) => {
                                                 </div>
                                             </div>
                                             <div className='flex items-center gap-2 '>
-                                                <Link href={`/agent-profile/${e._id}`}>
+                                                <Link href={`/agent-profile?id=${e._id}`}>
                                                     <Button
                                                         label='View Listings'
                                                         style='bg-black text-sm text-white whitespace-nowrap hover:!scale-100 !px-2 !py-0.5 rounded-md'
