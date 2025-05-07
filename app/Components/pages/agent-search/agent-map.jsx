@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Pagination from '../../shared/pagination'
 import PigeonMap from './map'
 import CustomLink from '../../shared/custom-link'
+import Link from 'next/link'
 
 const AgentMap = ({ data: initialData }) => {
     const router = useRouter()
@@ -202,12 +203,12 @@ const AgentMap = ({ data: initialData }) => {
                                                 </div>
                                             </div>
                                             <div className='flex items-center gap-2 '>
-                                                <CustomLink href={`/agent-profile/${e._id}`}>
+                                                <Link href={`/agent-profile/${e._id}`}>
                                                     <Button
                                                         label='View Listings'
                                                         style='bg-black text-sm text-white whitespace-nowrap hover:!scale-100 !px-2 !py-0.5 rounded-md'
                                                     />
-                                                </CustomLink>
+                                                </Link>
                                                 <div className='flex items-center gap-1 relative'>
                                                     <Button
                                                         onClick={() => handleShare(e._id)}
