@@ -118,7 +118,7 @@ const Hero = () => {
 
         // Always include pagination defaults
         params.set('page', '1');
-        params.set('limit', '10');
+        params.set('limit', '20');
 
         // Add non-empty search fields
         if (searchValues.agentName.trim()) params.set('agentName', searchValues.agentName.trim());

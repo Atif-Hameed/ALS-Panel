@@ -50,9 +50,9 @@ const ReferalTable = ({
     setOpenModal(true);
   };
 
-  const handleView = (referalId) => {
+  const handleView = (referalId, name) => {
     if (referalId) {
-      router.push(`/view-referal?id=${referalId}`);
+      router.push(`/view-referal?id=${referalId}&referal=${name}`);
     } else {
       toast.error("Referal is not Active user!");
     }
@@ -164,9 +164,8 @@ const ReferalTable = ({
               data.map((referral, i) => (
                 <tr
                   key={referral._id}
-                  className={`${
-                    i < data.length - 1 ? "border-b-2" : "border-none"
-                  } border-border text-gray`}
+                  className={`${i < data.length - 1 ? "border-b" : "border-none"
+                    } border-border text-dark`}
                 >
                   <td className="px-4 sm:pr-4 pr-6 py-3 whitespace-nowrap text-sm gap-2">
                     {(meta.currentPage - 1) * meta.itemsPerPage + i + 1}
@@ -182,13 +181,12 @@ const ReferalTable = ({
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div
-                      className={`w-[90%] sm:w-[60%] px-3 py-1 rounded-md text-center ${
-                        referral.status === "ACTIVE"
+                      className={`w-[90%] sm:w-[60%] px-3 py-1 rounded-md text-center ${referral.status === "ACTIVE"
                           ? "bg-green-100 text-green-800"
                           : referral.status === "INVITED"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
                     >
                       {referral.status}
                     </div>
@@ -202,14 +200,13 @@ const ReferalTable = ({
                     </button>
                     {openPopupIndex === i && (
                       <div
-                        className={`absolute ${
-                          data.length === i + 1 || data.length === i + 2
+                        className={`absolute ${data.length === i + 1 || data.length === i + 2
                             ? "bottom-2"
                             : "top-5"
-                        } right-20 sm:right-28 mt-2 bg-white text-sm rounded-lg shadow-lg space-y-1.5 z-10 p-2 popup-content`}
+                          } right-20 sm:right-28 mt-2 bg-white text-sm rounded-lg shadow-lg space-y-1.5 z-10 p-2 popup-content`}
                       >
                         <button
-                          onClick={() => handleView(referral._id)}
+                          onClick={() => handleView(referral._id, referral?.name || referral?.firstName)}
                           className="cursor-pointer flex items-center text-xs gap-2 w-full px-2 py-1 rounded text-[#5B93FF] bg-[#5b92ff3e]"
                         >
                           View

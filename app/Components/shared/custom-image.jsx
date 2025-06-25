@@ -3,7 +3,7 @@ import React from 'react'
 
 const CustomImage = ({ alt = '', src, className, width = '1000', height = '1000', divStyle }) => {
   return (
-    <div className={`${divStyle}`}>
+    <div className={`w-full h-full ${divStyle}`}>
       <Image
         alt={alt}
         src={src}

@@ -148,6 +148,7 @@ const Page = () => {
 
     fetchContractByEmail();
   }, [userEmail, isFetch]);
+
   useEffect(() => {
     const fetchContracts = async () => {
       if (!userId) return;
@@ -200,8 +201,6 @@ const Page = () => {
     }
     return true;
   });
-
-  console.log(filteredContracts)
 
   return (
     <div className="mt-4">

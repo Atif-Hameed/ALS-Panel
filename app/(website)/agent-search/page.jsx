@@ -7,14 +7,15 @@ const page = async ({ searchParams }) => {
     // Extract all query parameters
     const {
         page = '1',
-        limit = '10',
+        limit = '20',
         agentName,
         zipCode,
-        city
+        city,
+        isConsumer,
     } = await searchParams;
 
     const pageNumber = Number(page) || 1;
-    const limitNumber = Number(limit) || 10;
+    const limitNumber = Number(limit) || 20;
 
     // Prepare filters object
     const filters = {};
@@ -36,7 +37,7 @@ const page = async ({ searchParams }) => {
     return (
         <div className='h-full'>
             <Hero />
-            <AgentMap data={data} />
+            <AgentMap data={data} isConsumer={isConsumer} />
         </div>
     )
 }

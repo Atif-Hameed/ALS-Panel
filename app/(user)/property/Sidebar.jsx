@@ -50,6 +50,7 @@ const Sidebar = ({
   setStep,
   isAddress,
   activeSubTab,
+  setSiteProperty
 }) => {
   const [propertyNames, setPropertyNames] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,7 +68,8 @@ const Sidebar = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [validationError, setValidationError] = useState(null);
-  const [siteProperty, setSiteProperty] = useState();
+  
+  const [hasSiteCreated, setHasSiteCreated] = useState(false);
 
   const pathname = usePathname();
 
@@ -94,18 +96,17 @@ const Sidebar = ({
           `${API_BASE_URL}/property/get-property-name/${userId}`
         );
 
-        
-
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-
-        const properties = Array.isArray(data?.data)
-          ? data.data
-          : [];
+        const properties = Array.isArray(data?.data) ? data.data : [];
         setPropertyNames(properties);
+
+        // Check if any property has siteCreate: true
+        const hasCreatedSite = properties.some(prop => prop.siteCreate === true);
+        setHasSiteCreated(hasCreatedSite);
 
         const initialDropdowns = properties.reduce((acc, item) => {
           acc[item.propertyName] = false;
@@ -121,6 +122,7 @@ const Sidebar = ({
 
     fetchPropertyNames();
   }, [userId, isAddress]);
+
 
   const validatePropertyName = (name) => {
     // Remove leading/trailing whitespace
@@ -214,12 +216,25 @@ const Sidebar = ({
     setOpenDropdowns((prev) => ({ ...prev, [name]: !prev[name] }));
   };
 
-  const dropdownItems = [
-    { name: "Details & Address" },
-    { name: "Uploads" },
-    { name: "Features" },
-    { name: "Create Site" },
-  ];
+  // const dropdownItems = [
+  //   { name: "Details & Address" },
+  //   { name: "Uploads" },
+  //   { name: "Features" },
+  //   { name: "Create Site" },
+  // ];
+
+  const dropdownItems = (property) => {
+    const baseItems = [
+      { name: "Details & Address" },
+      { name: "Uploads" },
+      { name: "Features" },
+    ];
+    if (!hasSiteCreated || property.siteCreate) {
+      baseItems.push({ name: "Create Site" });
+    }
+
+    return baseItems;
+  };
 
   const handleDeleteClick = (propertyId, propertyName) => {
     setDeleteModal({
@@ -268,7 +283,7 @@ const Sidebar = ({
   };
 
   const handleCreateSite = (item) => {
-    setSiteProperty(item)
+    setSiteProperty(item?.propertyName)
   }
 
   console.log(propertyNames)
@@ -409,7 +424,7 @@ const Sidebar = ({
                     id={`dropdown-${propertyName}`}
                     className="flex flex-col space-y-1 mt-1 pl-2"
                   >
-                    {dropdownItems.map((item) => (
+                    {dropdownItems(property).map((item) => (
                       <div
                         key={item.name}
                         onClick={() => {
@@ -508,7 +523,7 @@ const Sidebar = ({
                         id={`dropdown-${propertyName}`}
                         className="flex flex-col space-y-1 mt-1 pl-2"
                       >
-                        {dropdownItems.map((item) => (
+                        {dropdownItems(property).map((item) => (
                           <div
                             key={item.name}
                             onClick={() => {

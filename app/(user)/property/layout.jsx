@@ -4,7 +4,7 @@ import Feature from "./feature/Feature";
 import Sidebar from "./Sidebar";
 import { useEffect, useState } from "react";
 import UplaodPage from "./upload/UplaodPage";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 export default function UserLayout({ children }) {
   const [handelPropertyNames, setHandelPropertyNames] = useState(null);
@@ -12,6 +12,7 @@ export default function UserLayout({ children }) {
   const [step, setStep] = useState();
   const [isAddress, setIsAddress] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState(null);
+  const [siteProperty, setSiteProperty] = useState();
 
   const router = useRouter();
 
@@ -27,9 +28,10 @@ export default function UserLayout({ children }) {
   // ✅ Redirect when actualStep is "Create Site"
   useEffect(() => {
     if (actualStep === "Create Site") {
-      router.push(`/create-site/${hanelPropertyId}`);
+      router.push(`/create-site?id=${hanelPropertyId}&property=${siteProperty}`);
     }
   }, [actualStep, router]);
+
 
   return (
     <div className=" h-[77vh]">
@@ -44,6 +46,7 @@ export default function UserLayout({ children }) {
             setHandelPropertyId={setHandelPropertyId}
             setHandelPropertyNames={setHandelPropertyNames}
             setStep={setStep}
+            setSiteProperty={setSiteProperty}
             activeSubTab={activeSubTab}
           />
         </div>

@@ -17,6 +17,8 @@ const CustomInput = ({
     onBlur,
     value,
     className,
+    labelStyle,
+    inputTextStyle
 }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [isFocused, setIsFocused] = useState(false); // Track focus for date input
@@ -44,7 +46,7 @@ const CustomInput = ({
             {label && (
                 <label
                     htmlFor={name}
-                    className="block mb-1.5 capitalize text-sm sm:text-base font-medium text-black"
+                    className={`block mb-1.5 capitalize text-sm sm:text-base font-medium text-black ${labelStyle} `}
                 >
                     {label}
                 </label>
@@ -62,9 +64,9 @@ const CustomInput = ({
                         name={name}
                         id={name}
                         value={value}
-                        className="w-full bg-transparent focus:outline-none text-darkGray placeholder:text-darkGray"
+                        className={`w-full bg-transparent focus:outline-none text-darkGray placeholder:text-darkGray input ${inputTextStyle}`}
                         onChange={onChange}
-                        
+
                         onBlur={(e) => {
                             setIsFocused(false); // optional: keep it "date" after focus
                             onBlur?.(e);

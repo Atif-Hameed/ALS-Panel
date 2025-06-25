@@ -6,11 +6,19 @@ import CustomLink from '../shared/custom-link'
 import Button from '../shared/custom-btn'
 import Link from 'next/link'
 import { useUserDetails } from '../../hooks/useUser'
+import { usePathname, useSearchParams } from 'next/navigation'
 
 const Navbar = ({ style }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [userId, setUserId] = useState(null)
     const { data: user } = useUserDetails(userId);
+    const params = useSearchParams();
+    const isConsumer = params.get('isConsumer') === 'true'; // Ensure boolean check
+
+    const pathname = usePathname()
+
+    if (pathname === '/property-site') return null
+
     // Get userId from localStorage and update formData
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -20,15 +28,16 @@ const Navbar = ({ style }) => {
             }
         }
     }, []);
+
     const navs = [
         { name: 'Search Agents', src: '/agent-search' },
-        { name: 'About', src: '#' },
-        { name: 'Contact', src: '#' },
-        { name: 'Login', src: '/login' },
+        { name: 'About', src: '/about' },
+        { name: 'Contact', src: '/contact' },
+        ...(!isConsumer ? [{ name: 'Login', src: '/login' }] : []), // Conditionally add Login
     ]
 
     return (
-        <div className={`w-full sm:py-6 py-4  flex items-center justify-between  ${style}`}>
+        <div className={`w-full sm:py-6 py-4 flex items-center justify-between ${style}`}>
             <Link href={'/'}>
                 <CustomImage
                     src={logo}
@@ -36,10 +45,9 @@ const Navbar = ({ style }) => {
                 />
             </Link>
 
-            {/* Desktop Navigation (hidden on mobile) */}
+            {/* Desktop Navigation */}
             <div className='hidden md:flex items-center xl:gap-10 lg:gap-8 gap-6 bg-lightDark z-50 whitespace-nowrap rounded-full px-8 py-2.5 justify-between'>
                 {navs.map((e, i) => (
-
                     <CustomLink
                         key={i}
                         href={e.src}
@@ -50,7 +58,7 @@ const Navbar = ({ style }) => {
                 ))}
             </div>
 
-            {/* Mobile Menu Button  */}
+            {/* Mobile Menu Button */}
             <button
                 className='md:hidden text-white focus:outline-none'
                 onClick={() => setIsOpen(!isOpen)}
@@ -64,15 +72,15 @@ const Navbar = ({ style }) => {
                 </svg>
             </button>
 
-            {/* Desktop Button (hidden on mobile) */}
+            {/* Desktop Button */}
             <Link href={user ? '/dashboard' : '/login'} className='hidden md:block'>
                 <Button
                     label='Claim Your Listing'
-                    style=' bg-black/65 !text-white rounded-full !px-4 border-none whitespace-nowrap'
+                    style='bg-black/65 !text-white rounded-full !px-4 border-none whitespace-nowrap'
                 />
             </Link>
 
-            {/* Mobile Menu (slides in from left) */}
+            {/* Mobile Menu */}
             <div className={`
                 fixed top-0 left-0 h-full w-64 bg-darkBlue z-50 transform transition-all duration-300 ease-in-out
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -95,13 +103,18 @@ const Navbar = ({ style }) => {
                             {e.name}
                         </CustomLink>
                     ))}
-                    <Link href={user ? '/dashboard' : '/login'} >
-                        <Button
-                            label='Claim Your Listing'
-                            style='mt-4 bg-black/65 !text-white rounded-full !px-4 border-none whitespace-nowrap'
-                            onClick={() => setIsOpen(false)}
-                        />
-                    </Link>
+                    {
+                        isConsumer ? <div></div>
+                            :
+                            <Link href={user ? '/dashboard' : '/login'}>
+                                <Button
+                                    label='Claim Your Listing'
+                                    style='mt-4 bg-black/65 !text-white rounded-full !px-4 border-none whitespace-nowrap'
+                                    onClick={() => setIsOpen(false)}
+                                />
+                            </Link>
+                    }
+
                 </div>
             </div>
 

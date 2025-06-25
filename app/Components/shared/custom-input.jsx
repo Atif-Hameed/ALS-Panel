@@ -24,7 +24,9 @@ const CustomInput = (
     className,
     showCross,
     onClear,
-    onKeyDown
+    onKeyDown,
+    disabled,
+    required
   }
 ) => {
 
@@ -73,6 +75,8 @@ const CustomInput = (
             onChange={onChange}
             onBlur={onBlur}
             onKeyDown={onKeyDown}
+            disabled={disabled}
+            required={required}
           />
           {showCross && (
             <button className="absolute right-0 group px-3 py-5 cursor-pointer top-1.5" onClick={handleClear}>
@@ -83,13 +87,13 @@ const CustomInput = (
           )}
           {inputType === "password" && (
             <div
-              className="flex items-center justify-center max-w-10"
+              className="flex absolute right-1 top-6 items-center justify-center max-w-10"
               onClick={togglePasswordVisibility}
             >
               {showPassword ? (
-                <IoIosEyeOff size={20} />
+                <IoIosEyeOff className="text-gray-500" size={20} />
               ) : (
-                <IoIosEye size={20} />
+                <IoIosEye className="text-gray-500" size={20} />
               )}
             </div>
           )}

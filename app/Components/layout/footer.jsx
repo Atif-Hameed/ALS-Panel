@@ -1,11 +1,12 @@
+'use client'
 import Link from "next/link";
 import Container from "../shared/container";
 import Button from "../shared/custom-btn";
 import CustomLink from "../shared/custom-link";
 import { FaTwitter, FaFacebookF, FaInstagram, FaGithub } from 'react-icons/fa';
+import { getAllPages } from "../../actions/content-pages";
+import { useEffect, useState } from "react";
 
-const quickLinks = ["About", "Features", "Works", "Career"];
-const helpLinks = ["Customer", "Support", "Delivery Details", "Terms & Conditions", "Privacy Policy"];
 const socialIcons = [
     { icon: <FaTwitter />, url: "#" },
     { icon: <FaFacebookF />, url: "#" },
@@ -14,27 +15,70 @@ const socialIcons = [
 ];
 
 export default function Footer() {
+    const [quickLinks, setQuickLinks] = useState([]);
+
+    const getPages = async () => {
+        try {
+            const { data, error } = await getAllPages();
+            if (error) {
+                console.log(error);
+            } else {
+                const dynamicLinks = data.map(page => ({
+                    label: page.pageName,
+                    src: `/${page.slug}`
+                }));
+                setQuickLinks(dynamicLinks);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        getPages();
+    }, []);
+
+    // Distribute links between two columns in chunks of 10
+    const distributeLinks = () => {
+        const column1 = [];
+        const column2 = [];
+        const chunkSize = 10;
+        
+        quickLinks.forEach((link, index) => {
+            const chunkIndex = Math.floor(index / chunkSize);
+            if (chunkIndex % 2 === 0) {
+                column1.push(link);
+            } else {
+                column2.push(link);
+            }
+        });
+
+        return { column1, column2 };
+    };
+
+    const { column1, column2 } = distributeLinks();
+
     return (
-        <Container parentStyle={'bg-black'} className=" text-white xl:px-20 sm:px-12 px-4 xl:py-20 py-12">
-            <div className=" mx-auto font-plusJakarta">
+        <Container parentStyle={'bg-black'} className="text-white xl:px-20 sm:px-12 px-4 xl:py-20 py-12">
+            <div className="mx-auto font-plusJakarta">
                 {/* Header */}
                 <div className="flex justify-between gap-4 items-center flex-wrap">
                     <div>
                         <h2 className="text-3xl font-bold">ALS</h2>
-                        <p className="mt-1 text-xl ">AGENT LISTING SERVICES</p>
+                        <p className="mt-1 text-xl">AGENT LISTING SERVICES</p>
                     </div>
                     <Button
                         label="Download Free Chapter"
-                        style="bg-white !text-black !px-3 font-medium  py-3 !text-sm rounded-full"
+                        style="bg-white !text-black !px-3 font-medium py-3 !text-sm rounded-full"
                     />
                 </div>
 
                 <hr className="border-b border-[#E4E4E7] my-8" />
 
                 {/* Footer Content */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 sm:grid-cols-2 gap-8 ">
+                <div className="grid grid-cols-1 lg:grid-cols-4 sm:grid-cols-2 gap-8">
                     {/* About */}
-                    <div>
+                    <div className={column2.length === 0 ? 'lg:col-span-2' : ''}>
                         <h3 className="font-bold mb-2">About</h3>
                         <p className="font-bold mb-2">Agent Listing Service</p>
                         <p className="text-white text-sm">
@@ -59,44 +103,42 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h3 className="font-bold mb-4">Quick Links</h3>
-                        <ul className="space-y-3 text-white">
-                            {quickLinks.map((link, index) => (
-                                <li key={index} className="text-sm">
-                                    <CustomLink
-                                        key={index}
-                                        href={'#'}
-                                    >
-                                        {link}
-                                    </CustomLink>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    {/* First Links Column */}
+                    {column1.length > 0 && (
+                        <div>
+                            <h3 className="font-bold mb-4">Quick Links</h3>
+                            <ul className="space-y-3 text-white">
+                                {column1.map((link, index) => (
+                                    <li key={index} className="text-sm">
+                                        <CustomLink href={link.src}>
+                                            {link.label}
+                                        </CustomLink>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
-                    {/* Help Links */}
-                    <div>
-                        <h3 className="font-bold mb-4">Help</h3>
-                        <ul className="space-y-3 text-white text-sm">
-                            {helpLinks.map((link, index) => (
-                                <li key={index}>
-                                    <CustomLink
-                                        key={index}
-                                        href={'#'}
-                                    >
-                                        {link}
-                                    </CustomLink>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    {/* Second Links Column */}
+                    {column2.length > 0 && (
+                        <div>
+                            <h3 className="font-bold mb-4">Quick Links</h3>
+                            <ul className="space-y-3 text-white">
+                                {column2.map((link, index) => (
+                                    <li key={index + column1.length} className="text-sm">
+                                        <CustomLink href={link.src}>
+                                            {link.label}
+                                        </CustomLink>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     {/* Address */}
                     <div>
                         <h3 className="font-bold mb-4">Address</h3>
-                        <p className="text-whie text-sm">
+                        <p className="text-white text-sm">
                             Street 123 Lorem ipsum dolor sit amet, USA
                         </p>
                     </div>

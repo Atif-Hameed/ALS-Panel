@@ -20,6 +20,22 @@ export const inviteAgent = async (data) => {
     }
 };
 
+// iNVITE Refral
+export const inviteReferal = async (data) => {
+    try {
+        const response = await axios.post(
+            `${API_BASE_URL}/agents/create-referal`,
+            data
+        );
+        return { data: response.data, error: null };
+    } catch (error) {
+        const errorMessage =
+            error.response?.data?.message ||
+            "An error occurred during Agent Invitation creation.";
+        return { data: null, error: errorMessage };
+    }
+};
+
 
 // accept invitation 
 export const inviteAccept = async (token, password) => {
@@ -28,6 +44,21 @@ export const inviteAccept = async (token, password) => {
             `${API_BASE_URL}/agents/accept-invitation?token=${token}`,
             password
         );
+        return { data: response.data, error: null };
+    } catch (error) {
+        const errorMessage =
+            error.response?.data?.message ||
+            "An error occurred during Agent Invitation creation.";
+        return { data: null, error: errorMessage };
+    }
+};
+
+
+// accept referal invitation 
+export const inviteAcceptReferal = async (token) => {
+    try {
+        const response = await axios.post(
+            `${API_BASE_URL}/agents/accept-referal-invitation?token=${token}`);
         return { data: response.data, error: null };
     } catch (error) {
         const errorMessage =
@@ -110,6 +141,42 @@ export const getReferalbyId = async (id) => {
         const errorMessage =
             error.response?.data?.message ||
             "An error occurred during Agent fething.";
+        return { data: null, error: errorMessage };
+    }
+};
+
+
+
+
+// Share link via sms
+export const shareLink = async (data) => {
+    try {
+        const response = await axios.post(
+            `${API_BASE_URL}/agents/share-link`,
+            data
+        );
+        return { data: response.data, error: null };
+    } catch (error) {
+        const errorMessage =
+            error.response?.data?.message ||
+            "An error occurred during sharing link.";
+        return { data: null, error: errorMessage };
+    }
+};
+
+
+// Share link via email
+export const shareLinkViaEmail = async (data) => {
+    try {
+        const response = await axios.post(
+            `${API_BASE_URL}/agents/share-link-email`,
+            data
+        );
+        return { data: response.data, error: null };
+    } catch (error) {
+        const errorMessage =
+            error.response?.data?.message ||
+            "An error occurred during sharing link.";
         return { data: null, error: errorMessage };
     }
 };

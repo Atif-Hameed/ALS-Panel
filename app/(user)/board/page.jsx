@@ -4,6 +4,7 @@ import ChatMessage from "./ChatMessage";
 import ChatInput from "./ChatInput";
 import { API_BASE_URL } from "../../api";
 import { io } from "socket.io-client";
+import { generateBoardData } from "../../data/index";
 
 const PAGE_SIZE = 10;
 
@@ -160,6 +161,21 @@ const BoardPage = () => {
     const options = { weekday: "long", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
+
+
+  const getLoc = async () => {
+    try {
+      const locations = await generateBoardData();
+      console.log("locations,,,,,,,,,,,,", locations)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    getLoc();
+  }, [])
+
 
   return (
     <div className="h-full">

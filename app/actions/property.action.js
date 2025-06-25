@@ -121,3 +121,90 @@ export const getReferalPropertiesImages = async (propertyId) => {
         return { data: null, error: errorMessage };
     }
 };
+
+
+
+// get property site settings
+export const getPropertySiteSettings = async (propertyId) => {
+    try {
+        const response = await fetcher(
+            `/api/propertySite/get-propertySite-settings/${propertyId}`,
+            {
+                baseUrl: API_URL,
+                cacheStrategy: "no-cache",
+            }
+        );
+        return { data: response, error: null };
+    } catch (error) {
+        const errorMessage =
+            error?.message || "An error occurred during Agent's property images.";
+        return { data: null, error: errorMessage };
+    }
+};
+
+
+// create property site settings
+export const createPropertySite = async (propertyId, userId, siteSettings) => {
+    try {
+        const response = await fetcher(
+            `/api/propertySite/create-propertySite`,
+            {
+                baseUrl: API_URL,
+                method: 'POST',
+                body: JSON.stringify({
+                    propertyId,
+                    userId,
+                    ...siteSettings
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                cacheStrategy: "no-cache",
+            }
+        );
+
+        return {
+            data: response,
+            error: null
+        };
+    } catch (error) {
+        const errorMessage =
+            error?.message || "Failed to create property site";
+        return {
+            data: null,
+            error: errorMessage
+        };
+    }
+};
+
+
+
+// Update property site settings
+export const updatePropertySiteSettings = async (propertyId, UserId, updates) => {
+    try {
+        const response = await fetcher(
+            `/api/propertySite/update-propertySite-settings/${propertyId}/${UserId}`,
+            {
+                baseUrl: API_URL,
+                method: 'PUT',
+                body: JSON.stringify(updates),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                cacheStrategy: "no-cache",
+            }
+        );
+
+        return {
+            data: response,
+            error: null
+        };
+    } catch (error) {
+        const errorMessage =
+            error?.message || "Failed to update property settings";
+        return {
+            data: null,
+            error: errorMessage
+        };
+    }
+};

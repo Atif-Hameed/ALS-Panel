@@ -141,3 +141,77 @@ export const getUserData = async (userId) => {
         return { data: null, error: errorMessage };
     }
 };
+
+
+
+// update user
+export const updateUser = async (userId, updateData) => {
+    console.log('Updating user:', userId, updateData);
+    try {
+        const response = await fetcher(`/api/auth/update-user/${userId}`, {
+            method: 'PUT',
+            baseUrl: API_URL,
+            body: JSON.stringify(updateData),
+            cacheStrategy: "no-cache",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        return { data: response, error: null };
+    } catch (error) {
+        const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred during user update.';
+        console.log(errorMessage)
+        return { data: null, error: errorMessage };
+    }
+};
+
+
+
+// verififcation otp
+export const verifyOTP = async (userId, { otp, field }) => {
+    console.log('Verifying OTP for user:', userId, { otp, field });
+    try {
+        const response = await fetcher(`/api/auth/verify-otp/${userId}`, {
+            method: 'POST',
+            baseUrl: API_URL,
+            body: JSON.stringify({ otp, field }),
+            cacheStrategy: "no-cache",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        return { data: response, error: null };
+    } catch (error) {
+        const errorMessage = error?.response?.data?.message || error?.message || 'An error occurred during OTP verification.';
+        console.log(errorMessage);
+        return { data: null, error: errorMessage };
+    }
+};
+
+
+
+export const fetchUserPlan = async ({ email, userId }) => {
+    try {
+        const response = await fetch(`${API_URL}/api/auth/user-plan`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, userId }),
+            cache: 'no-store',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data?.message || 'Failed to fetch user plan');
+        }
+
+        return { data: data.plan, error: null };
+    } catch (error) {
+        console.error('Error in fetchUserPlan:', error);
+        return { data: null, error: error.message || 'Unknown error' };
+    }
+};

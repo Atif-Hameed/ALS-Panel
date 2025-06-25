@@ -13,7 +13,7 @@ const menuItems = [
   { name: "Referrals", href: "/referrals", Icon: AgentIcon },
   { name: "Reviews", href: "/reviews", Icon: EnvelopIcon },
   { name: "Contract", href: "/contract", Icon: EnvelopIcon },
-  { name: "Board", href: "/board", Icon: EnvelopIcon },
+  { name: "Board", href: "/board-post", Icon: EnvelopIcon },
   { name: "Messages", href: "/messages", Icon: EnvelopIcon },
 ];
 

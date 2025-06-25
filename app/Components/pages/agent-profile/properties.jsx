@@ -10,6 +10,8 @@ const Properties = ({ properties = [], reviews = [], meta = {}, currentPage = 1,
     const router = useRouter()
     const searchParams = useSearchParams()
 
+    console.log(properties)
+
     const handlePageChange = (newPage) => {
         const params = new URLSearchParams(searchParams.toString())
         params.set('page', newPage.toString())
@@ -26,22 +28,6 @@ const Properties = ({ properties = [], reviews = [], meta = {}, currentPage = 1,
     // Safely check pagination conditions
     const showPagination = meta?.totalPages > 1
 
-    // Default property details configuration
-    const getPropertyDetails = (property) => [
-        { 
-            label: property?.features?.buildingSize ? `${property.features.buildingSize} sq.ft` : 'N/A', 
-            type: 'area' 
-        },
-        { 
-            label: property?.features?.bedrooms ? `${property.features.bedrooms} Bed` : 'N/A', 
-            type: 'bed' 
-        },
-        { 
-            label: property?.features?.bathrooms ? `${property.features.bathrooms} Bath` : 'N/A', 
-            type: 'bath' 
-        }
-    ]
-
     if (properties.length === 0) {
         return (
             <Container className="py-8">
@@ -53,6 +39,25 @@ const Properties = ({ properties = [], reviews = [], meta = {}, currentPage = 1,
             </Container>
         )
     }
+
+
+    // Default property details configuration
+    const getPropertyDetails = (property) => [
+        {
+            label: property?.features?.buildingSize ? `${property.features.buildingSize} sq.ft` : 'N/A',
+            type: 'area'
+        },
+        {
+            label: property?.features?.bedrooms ? `${property.features.bedrooms} Bed` : 'N/A',
+            type: 'bed'
+        },
+        {
+            label: property?.features?.bathrooms ? `${property.features.bathrooms} Bath` : 'N/A',
+            type: 'bath'
+        }
+    ]
+
+    console.log(properties)
 
     return (
         <Container className="py-8">
@@ -92,6 +97,11 @@ const Properties = ({ properties = [], reviews = [], meta = {}, currentPage = 1,
                                     ))}
                                 </div>
                             </div>
+
+                            {
+                                property?.siteCreate &&
+                                <button onClick={() => router.push(`/property-site?id=${property._id}`)} className='bg-black cursor-pointer hover:text-blue mt-2 text-white p-2 rounded-lg' >See Property Details</button>
+                            }
                         </div>
                     )
                 })}

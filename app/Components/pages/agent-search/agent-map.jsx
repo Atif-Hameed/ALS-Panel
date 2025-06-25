@@ -10,20 +10,26 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Pagination from '../../shared/pagination'
 import PigeonMap from './map'
 import CustomLink from '../../shared/custom-link'
-import Link from 'next/link'
+import Modal from '../../common/modal'
+import { FaCopy, FaFacebook, FaPhone } from 'react-icons/fa'
+import ShareModal from './share-modal'
 
-const AgentMap = ({ data: initialData }) => {
+const AgentMap = ({ data: initialData, isConsumer }) => {
     const router = useRouter()
     const searchParams = useSearchParams()
     const currentPage = initialData.meta?.currentPage || 1
     const totalPages = initialData.meta?.totalPages || 10
+    const totalAgents = initialData.meta?.totalItems || 0
+    const itemsPerPage = initialData.meta?.itemsPerPage || 10
     const [hasFilters, setHasFilters] = useState(false)
     const [copiedId, setCopiedId] = useState(null)
     const [isPending, startTransition] = useTransition();
     const [filteredData, setFilteredData] = useState(initialData);
     const [mapBounds, setMapBounds] = useState(null);
-
-    console.log(filteredData)
+    const [resetTrigger, setResetTrigger] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
+    const [selectedAgent, setSelectedAgent] = useState(null);
+    const [shareUrl, setShareUrl] = useState('');
 
     const handleViewChange = useCallback((bounds) => {
         // Validate bounds before setting them
@@ -107,28 +113,66 @@ const AgentMap = ({ data: initialData }) => {
         }
         startTransition(() => {
             router.push(`?${params.toString()}`, { scroll: false });
+            router.refresh();
+            setResetTrigger(prev => !prev);
         });
     }
 
-    const handleShare = async (agentId) => {
+    // handleShare to open modal
+    const handleShare = (agentId) => {
         const host = window.location.origin;
-        const url = `${host}/agent-profile/${agentId}`;
+        const url = `${host}/agent-profile?id=${agentId}&${searchParams.toString()}`;
+        setShareUrl(url);
+        setSelectedAgent(agentId);
+        setShowShareModal(true);
+    };
 
-        try {
-            if (navigator.clipboard && document.hasFocus()) {
-                await navigator.clipboard.writeText(url);
-            } else {
-                const textArea = document.createElement('textarea');
-                textArea.value = url;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-            }
-            setCopiedId(agentId);
-            setTimeout(() => setCopiedId(null), 2000);
-        } catch (error) {
-            console.error('Copy failed:', error);
+
+    const getAgentProfileUrl = (agentId) => {
+        const params = new URLSearchParams();
+
+        // Always set agent ID in query param
+        params.set('id', agentId);
+
+        // Preserve other query parameters
+        if (searchParams.get('page')) {
+            params.set('page', searchParams.get('page'));
+        }
+        if (searchParams.get('limit')) {
+            params.set('limit', searchParams.get('limit'));
+        }
+        // Add isConsumer=true if the prop is true
+        if (isConsumer) {
+            params.set('isConsumer', isConsumer);
+        }
+
+        return `/agent-profile?${params.toString()}`;
+    };
+
+    // Add this effect to trigger map reset when data changes with filters
+    useEffect(() => {
+        setMapBounds(null);
+
+        // Only trigger reset if there are URL filters
+        const hasUrlFilters = searchParams.has('agentName') ||
+            searchParams.has('zipCode') ||
+            searchParams.has('city');
+
+        if (hasUrlFilters) {
+            setResetTrigger(prev => !prev); // Toggle to trigger map reset
+        }
+    }, [initialData, searchParams]);
+
+    // Calculate the range of agents being shown
+    const getDisplayRange = () => {
+        if (mapBounds) {
+            // When map bounds are applied, show filtered count vs total
+            return `${filteredData.data.length} out of ${totalAgents} agents`;
+        } else {
+            // When no map bounds, show pagination range
+            const start = ((currentPage - 1) * itemsPerPage) + 1;
+            const end = Math.min(currentPage * itemsPerPage, totalAgents);
+            return `${start}-${end} of ${totalAgents} agents`;
         }
     };
 
@@ -156,6 +200,9 @@ const AgentMap = ({ data: initialData }) => {
                                     style='bg-red-500 text-white !px-2 !py-1 text-sm rounded-md !text-[10px] flex items-center gap-1'
                                 />
                             )}
+                            <div className="text-xs text-gray-500 ">
+                                {getDisplayRange()}
+                            </div>
                             <span className='text-lg font-semibold text-gray-600'>
                                 ({filteredData.data.length})
                             </span>
@@ -171,7 +218,7 @@ const AgentMap = ({ data: initialData }) => {
                                 </div>
                                 :
                                 filteredData.data?.map((e, i) => (
-                                    <div key={i} className='flex md:gap-4 md:flex-row flex-col md:w-auto lg:min-w-auto sm:min-w-[50vw] min-w-[75vw] w-full gap-2 sm:p-4 p-3 bg-white rounded-lg shadow'>
+                                    <div key={i} className='flex md:gap-4 md:flex-row flex-col md:w-auto lg:min-w-auto sm:min-w-[50vw] min-w-[79vw] w-full gap-2 sm:p-4 p-3 bg-white rounded-lg shadow'>
                                         <div>
                                             <CustomImage src={e.profileImage ? e.profileImage : '/assets/images/dumy.png'} className={'sm:w-16 w-12 sm:h-16 h-12 rounded-lg object-cover'} />
                                         </div>
@@ -202,18 +249,28 @@ const AgentMap = ({ data: initialData }) => {
                                                     }
                                                 </div>
                                             </div>
-                                            <div className='flex items-center gap-2 '>
-                                                <Link href={`/agent-profile?id=${e._id}`}>
+                                            <div className='flex items-center gap-2 py-3 z-30'>
+                                                <CustomLink className={'hover:!scale-100'} href={getAgentProfileUrl(e._id)}>
                                                     <Button
-                                                        label='View Listings'
-                                                        style='bg-black text-sm text-white whitespace-nowrap hover:!scale-100 !px-2 !py-0.5 rounded-md'
+                                                        label='View Profile'
+                                                        style='bg-black !text-sm text-white whitespace-nowrap  !px-2 !py-0.5 rounded-md'
                                                     />
-                                                </Link>
+                                                </CustomLink>
+                                                {isConsumer === 'false' &&
+                                                    !e.password &&
+                                                    <CustomLink className={'hover:!scale-100'} href={`/plan?email=${e.email}&id=${e._id}`}>
+                                                        <Button
+                                                            label='Claim listing'
+                                                            style='bg-black !text-sm text-white whitespace-nowrap  !px-2 !py-0.5 rounded-md'
+                                                        />
+                                                    </CustomLink>
+                                                }
+
                                                 <div className='flex items-center gap-1 relative'>
                                                     <Button
                                                         onClick={() => handleShare(e._id)}
                                                         label='Share'
-                                                        style='bg-black text-sm text-white !px-2 whitespace-nowrap !py-0.5 hover:!scale-100 rounded-md'
+                                                        style='bg-black !text-sm text-white !px-2 whitespace-nowrap !py-0.5 hover:!scale-105 rounded-md'
                                                         icon={<RiShareBoxFill className='text-white' />}
                                                         iconPosition='right'
                                                     />
@@ -245,6 +302,7 @@ const AgentMap = ({ data: initialData }) => {
                         <PigeonMap
                             data={initialData.data}
                             onViewChange={handleViewChange}
+                            resetTrigger={resetTrigger}
                         />
                     )}
                     {initialData.data.length === 0 && (
@@ -256,6 +314,19 @@ const AgentMap = ({ data: initialData }) => {
                 </div>
 
             </Container>
+
+
+            {/* Share Modal */}
+            <Modal isOpen={showShareModal} onClose={() => setShowShareModal(false)}>
+                <ShareModal
+                    shareUrl={shareUrl}
+                    selectedAgent={selectedAgent}
+                    filteredData={filteredData}
+                    setCopiedId={setCopiedId}
+                    copiedId={copiedId}
+                    setShowShareModal={setShowShareModal}
+                />
+            </Modal>
         </div>
     )
 }
